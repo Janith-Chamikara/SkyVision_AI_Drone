@@ -1,5 +1,7 @@
 # RT-MonoDepth Usage Guide
 
+![Sample video preview](sample.gif)
+
 This guide explains how to use the RT-MonoDepth project for depth estimation, video visualization, and point cloud generation. This project builds upon the RTMonoDepth model for real-time monocular depth estimation, extending it with point cloud generation capabilities.
 
 ## Setup
@@ -158,17 +160,6 @@ Frame 28/28 - Points: 122880
 
 Saving point cloud to point_clouds/kitti-frames_pointcloud.ply
 Saved point cloud with 3309127 points
-```
-
-### Sample Videos
-
-https://github.com/Janith-Chamikara/RT-MonoDepth/assets/demo.gif
-
-Above is a demonstration of the depth estimation and point cloud generation in action. The left side shows the input RGB image, and the right side shows the corresponding depth map visualization.
-
-You can process your own videos by first extracting the frames:
-```bash
-python process_sequence.py --weight_path ./weights/RTMonoDepth/full/ms_640_192/ --input_path ./extracted_frames --image_format jpg
 ```
 
 
