@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+depth_videos/
+point_clouds/
+*.mp4
+*.ply
+*.npy
+*.pkl
+
+# Weights and checkpoints
+weights/**/*.pth
+weights/**/*.pt
+weights/**/*.ckpt
+!weights/RTMonoDepth/README.md
+
+# Generated files
+*.jpg
+*.png
+*.jpeg
+!test-images/*.jpg
+!test-images/*.png
+!test-images/*.jpeg
+
+# Logs and databases
+*.log
+*.sqlite
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
