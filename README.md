@@ -85,34 +85,6 @@ This will:
 - Display RGB and depth visualization
 - Save depth map outputs in the same directory as input image
 
-### 3. Generate Point Cloud from Image
-Use `depth_to_pointcloud.py` to create a point cloud from a single image:
-
-```bash
-python depth_to_pointcloud.py --image_path ./test-images/1.jpg --weight_path ./weights/RTMonoDepth/full/ms_640_192/
-```
-
-This will:
-- Generate depth map
-- Create and display 3D point cloud
-- Save point cloud file in PLY format
-
-## Visualization Controls
-
-### Point Cloud Viewer
-- Left mouse button: Rotate view
-- Middle mouse button: Pan
-- Right mouse button: Zoom
-- '[' and ']': Change point size
-- 'r': Reset view
-- 'q': Close viewer
-
-### Video Visualization
-- RGB image shown on the left
-- Depth map visualization on the right (MAGMA colormap)
-- Frame counter displayed in top-left corner
-- Press 'Q' to quit visualization
-
 ## Output Files
 
 ### Video Output
