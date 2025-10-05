@@ -4,8 +4,10 @@
         "width": 640,
         "height": 480,
         "fps": 30,
-        "focal_length_x": 1,
-        "focal_length_y": 1
+        "focal_length_x": 984.2439,
+        "focal_length_y": 980.8141,
+        "c_x":690.00,
+        "c_y": 233.196
     },
     "model": {
         "input_width": 640,
@@ -15,7 +17,7 @@
         "enabled": true,
         "window_width": 1024,
         "window_height": 768,
-        "point_size": 4.0,
+        "point_size": 1.0,
         "background_color": [0.1, 0.1, 0.1],
         "depth_scale": 30.0,
         "min_depth": 0.1,

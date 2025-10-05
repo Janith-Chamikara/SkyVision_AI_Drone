@@ -9,14 +9,15 @@ import open3d as o3d
 
 class SequenceProcessor:
     def __init__(self, weight_path, config_path="config.json", use_cuda=True):
-        # Load configuration
         with open(config_path, 'r') as f:
             self.config = json.load(f)
             
         self.depth_processor = DepthProcessor(weight_path, use_cuda)
+
+        self.video_config = self.config['video']
+        self.model_config = self.config['model']
         self.pc_config = self.config['point_cloud']
         
-        # Setup output directories
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.video_dir = os.path.join(self.base_dir, 'depth_videos')
         self.pointcloud_dir = os.path.join(self.base_dir, 'point_clouds')
@@ -24,12 +25,11 @@ class SequenceProcessor:
         os.makedirs(self.pointcloud_dir, exist_ok=True)
         
     def process_sequence(self, input_path, image_format='jpg'):
-        # Generate output paths based on input directory name
+        """Process a sequence of images to create point cloud and optionally save depth video."""
+        
         input_dir_name = os.path.basename(os.path.normpath(input_path))
         video_path = os.path.join(self.video_dir, f'{input_dir_name}_depth.mp4')
         pointcloud_path = os.path.join(self.pointcloud_dir, f'{input_dir_name}_pointcloud.ply')
-        """Process a sequence of images to create point cloud and optionally save depth video."""
-        # Get sorted list of image files
         image_files = sorted(glob.glob(os.path.join(input_path, f'*.{image_format}')))
         
         if not image_files:
@@ -38,66 +38,55 @@ class SequenceProcessor:
             
         print(f"Found {len(image_files)} images to process")
         
-        # Initialize storage for accumulated point cloud data
         all_points = []
         all_colors = []
         
-        # Initialize video writer if video path is provided
         video_writer = None
         if video_path:
-            # Read first frame to get dimensions
             first_frame = cv2.imread(image_files[0])
             height, width = first_frame.shape[:2]
             
-            # Create output directory if needed (only if path contains directories)
             video_dir = os.path.dirname(video_path)
             if video_dir:
                 os.makedirs(video_dir, exist_ok=True)
             
-            # Initialize video writer
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')
             video_writer = cv2.VideoWriter(
                 video_path,
                 fourcc,
-                30.0,  # FPS
-                (width * 2, height)  # Double width for side-by-side display
+                30.0, 
+                (width * 2, height) 
             )
 
         try:
-            # Create and setup visualization window
             window_name = 'RGB and Depth Visualization'
             cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-            cv2.resizeWindow(window_name, 1280, 480)  # Set a reasonable default size
+            cv2.resizeWindow(window_name, 1280, 480) 
             
             print("\nProcessing frames...")
             print("Press 'Q' to stop early")
             
             for idx, image_file in enumerate(image_files):
-                # Read frame
                 frame = cv2.imread(image_file)
                 if frame is None:
                     print(f"Failed to read image: {image_file}")
                     continue
                 
-                # Get depth map and processed frame
                 depth_map, resized_frame = self.depth_processor.estimate_depth(frame)
                 
-                # Create color map for visualization
                 depth_colormap = cv2.applyColorMap(
                     cv2.normalize(depth_map, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U),
                     cv2.COLORMAP_MAGMA
                 )
                 
-                # Resize depth colormap to match original frame size
                 depth_display = cv2.resize(depth_colormap, (frame.shape[1], frame.shape[0]))
 
-                # Generate point cloud data
                 if self.pc_config['enabled']:
                     h, w = depth_map.shape
-                    fx = 984.2439
-                    fy = 980.8141
-                    cx = 690.00
-                    cy = 233.196
+                    fx =  self.video_config['focal_length_x']
+                    fy =  self.video_config['focal_length_y']
+                    cx =  self.video_config['c_x']
+                    cy =  self.video_config['c_y']
                     
                     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
                     frame_points = []
@@ -106,7 +95,7 @@ class SequenceProcessor:
                     for v in range(h):
                         for u in range(w):
                             depth = depth_map[v, u] * self.pc_config['depth_scale']
-                            if depth > 0:  # Valid depth
+                            if depth > 0: 
                                 x = (u - cx) * depth / fx
                                 y = (v - cy) * depth / fy
                                 z = depth
@@ -119,10 +108,8 @@ class SequenceProcessor:
                         all_colors.extend(frame_colors)
                         print(f"Frame {idx + 1}/{len(image_files)} - Points: {len(frame_points)}")
 
-                # Create side-by-side display
                 combined_display = np.hstack((frame, depth_display))
                 
-                # Add frame counter
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 cv2.putText(combined_display, f'Frame {idx + 1}/{len(image_files)}', 
                           (10, 30), font, 1, (255, 255, 255), 2)
@@ -143,48 +130,39 @@ class SequenceProcessor:
             if video_writer is not None:
                 video_writer.release()
 
-        # Save point cloud
         if all_points:
             points_array = np.array(all_points)
             colors_array = np.array(all_colors)
             
-            # Create Open3D point cloud
             pcd = o3d.geometry.PointCloud()
             pcd.points = o3d.utility.Vector3dVector(points_array)
             pcd.colors = o3d.utility.Vector3dVector(colors_array)
             
-            # Optionally, remove statistical outliers
             pcd, _ = pcd.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.0)
             
-            # Save the point cloud
             print(f"\nSaving point cloud to {pointcloud_path}")
             o3d.io.write_point_cloud(pointcloud_path, pcd)
             print(f"Saved point cloud with {len(pcd.points)} points")
             
-            # Visualize the point cloud
             if self.pc_config['enabled']:
                 self._visualize_point_cloud(pcd)
 
     def _visualize_point_cloud(self, pcd):
         """Visualize a point cloud using Open3D."""
-        # Create visualizer
         vis = o3d.visualization.Visualizer()
         vis.create_window("Point Cloud Viewer")
         
-        # Add the geometry
         vis.add_geometry(pcd)
         
-        # Set default camera view
         ctr = vis.get_view_control()
         ctr.set_zoom(0.8)
         ctr.set_front([0, 0, -1])
         ctr.set_lookat([0, 0, 0])
         ctr.set_up([0, -1, 0])
         
-        # Improve visualization
         opt = vis.get_render_option()
-        opt.point_size = 1.0
-        opt.background_color = [0.1, 0.1, 0.1]  # Dark gray background
+        opt.point_size = self.pc_config['point_size']
+        opt.background_color = self.pc_config.get('background_color', [0.1, 0.1, 0.1])
         
         print("\nPoint Cloud Visualization Controls:")
         print("- Left mouse button: Rotate")
@@ -194,7 +172,6 @@ class SequenceProcessor:
         print("- 'r': Reset view")
         print("- 'q': Close viewer")
         
-        # Run the visualizer
         vis.run()
         vis.destroy_window()
 
