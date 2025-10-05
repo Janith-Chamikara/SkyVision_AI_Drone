@@ -34,7 +34,6 @@ env/
 # Project specific
 depth_videos/
 point_clouds/
-*.mp4
 *.ply
 *.npy
 *.pkl

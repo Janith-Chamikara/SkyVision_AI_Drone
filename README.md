@@ -161,10 +161,16 @@ Saved point cloud with 3309127 points
 ```
 
 ### Sample Videos
-The project includes a sample video (`sample.mp4`) that demonstrates the depth estimation capabilities. Process it using:
+
+https://github.com/Janith-Chamikara/RT-MonoDepth/assets/demo.gif
+
+Above is a demonstration of the depth estimation and point cloud generation in action. The left side shows the input RGB image, and the right side shows the corresponding depth map visualization.
+
+You can process your own videos by first extracting the frames:
 ```bash
 python process_sequence.py --weight_path ./weights/RTMonoDepth/full/ms_640_192/ --input_path ./extracted_frames --image_format jpg
 ```
+
 
 ## Notes
 - Required output directories (`depth_videos/`, `point_clouds/`) should be created before running the scripts (see Setup section)
