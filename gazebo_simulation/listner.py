@@ -17,7 +17,7 @@ class GazeboListener:
         Callback function when image message is received
         """
 
-        print(msg)
+        print(msg.width, msg.height, msg.pixel_format_type)
 
         width = msg.width
         height = msg.height
@@ -28,12 +28,10 @@ class GazeboListener:
 
         print(image_data)
         
-        if pixel_format == "RGB_INT8":
+        if pixel_format == 3:
             image = image_data.reshape((height, width, 3))
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        else:
-            print(f"Unsupported pixel format: {pixel_format}")
-            return
+            print(image)
+            # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         
         self.image_data = image
         self.image_received = True
@@ -41,7 +39,6 @@ class GazeboListener:
         cv2.imshow("Gazebo Camera Feed", image)
         cv2.waitKey(1)
         
-        print(f"Received image: {width}x{height}, Format: {pixel_format}")
     
     def subscribe_to_camera(self, topic_name="/camera"):
         """
