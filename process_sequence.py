@@ -20,17 +20,21 @@ class SequenceProcessor:
         
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.video_dir = os.path.join(self.base_dir, 'depth_videos')
+        self.depth_maps_root = os.path.join(self.base_dir, 'depth_maps')
         self.pointcloud_dir = os.path.join(self.base_dir, 'point_clouds')
         os.makedirs(self.video_dir, exist_ok=True)
+        os.makedirs(self.depth_maps_root, exist_ok=True)
         os.makedirs(self.pointcloud_dir, exist_ok=True)
         
     def process_sequence(self, input_path, image_format='jpg'):
-        """Process a sequence of images to create point cloud and optionally save depth video."""
+        """Two-phase pipeline: 1) save per-frame depth maps, 2) build point cloud from saved depth maps."""
         
         input_dir_name = os.path.basename(os.path.normpath(input_path))
         video_path = os.path.join(self.video_dir, f'{input_dir_name}_depth.mp4')
         pointcloud_path = os.path.join(self.pointcloud_dir, f'{input_dir_name}_pointcloud.ply')
         image_files = sorted(glob.glob(os.path.join(input_path, f'*.{image_format}')))
+        depth_dir = os.path.join(self.depth_maps_root, input_dir_name)
+        os.makedirs(depth_dir, exist_ok=True)
         
         if not image_files:
             print(f"No {image_format} files found in {input_path}")
@@ -38,9 +42,9 @@ class SequenceProcessor:
             
         print(f"Found {len(image_files)} images to process")
         
-        all_points = []
-        all_colors = []
-        
+        # ----------------------------
+        # Phase 1: Predict and save depth
+        # ----------------------------
         video_writer = None
         if video_path:
             first_frame = cv2.imread(image_files[0])
@@ -63,7 +67,7 @@ class SequenceProcessor:
             cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
             cv2.resizeWindow(window_name, 1280, 480) 
             
-            print("\nProcessing frames...")
+            print("\nPhase 1/2: Estimating depth and saving to disk...")
             print("Press 'Q' to stop early")
             
             for idx, image_file in enumerate(image_files):
@@ -81,32 +85,17 @@ class SequenceProcessor:
                 
                 depth_display = cv2.resize(depth_colormap, (frame.shape[1], frame.shape[0]))
 
-                if self.pc_config['enabled']:
-                    h, w = depth_map.shape
-                    fx =  self.video_config['focal_length_x']
-                    fy =  self.video_config['focal_length_y']
-                    cx =  self.video_config['c_x']
-                    cy =  self.video_config['c_y']
-                    
-                    rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
-                    frame_points = []
-                    frame_colors = []
-                    
-                    for v in range(h):
-                        for u in range(w):
-                            depth = depth_map[v, u] * self.pc_config['depth_scale']
-                            if depth > 0: 
-                                x = (u - cx) * depth / fx
-                                y = (v - cy) * depth / fy
-                                z = depth
-                                
-                                frame_points.append([x, y, z])
-                                frame_colors.append(rgb_frame[v, u] / 255.0)
-                    
-                    if frame_points:
-                        all_points.extend(frame_points)
-                        all_colors.extend(frame_colors)
-                        print(f"Frame {idx + 1}/{len(image_files)} - Points: {len(frame_points)}")
+                # Save depth artifacts
+                base = os.path.splitext(os.path.basename(image_file))[0]
+                npy_path = os.path.join(depth_dir, f"{base}.npy")
+                png_path = os.path.join(depth_dir, f"{base}_depth.png")
+                try:
+                    # Save the raw depth for accurate downstream use
+                    np.save(npy_path, depth_map.astype(np.float32))
+                    # Save a preview image for quick inspection
+                    cv2.imwrite(png_path, depth_colormap)
+                except Exception as e:
+                    print(f"Warning: Failed to save depth for {image_file}: {e}")
 
                 combined_display = np.hstack((frame, depth_display))
                 
@@ -130,21 +119,75 @@ class SequenceProcessor:
             if video_writer is not None:
                 video_writer.release()
 
-        if all_points:
-            points_array = np.array(all_points)
-            colors_array = np.array(all_colors)
-            
-            pcd = o3d.geometry.PointCloud()
-            pcd.points = o3d.utility.Vector3dVector(points_array)
-            pcd.colors = o3d.utility.Vector3dVector(colors_array)
-            
-            pcd, _ = pcd.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.0)
-            
-            print(f"\nSaving point cloud to {pointcloud_path}")
-            o3d.io.write_point_cloud(pointcloud_path, pcd)
-            print(f"Saved point cloud with {len(pcd.points)} points")
-            
-            if self.pc_config['enabled']:
+        # ----------------------------
+        # Phase 2: Build point cloud from saved depth maps
+        # ----------------------------
+        if self.pc_config['enabled']:
+            print("\nPhase 2/2: Building point cloud from saved depth maps...")
+            depth_npy_files = sorted(glob.glob(os.path.join(depth_dir, '*.npy')))
+            if not depth_npy_files:
+                print(f"No saved depth maps found in {depth_dir}. Nothing to build.")
+                return
+
+            # Map basenames to original image paths for color retrieval
+            base_to_img = {os.path.splitext(os.path.basename(p))[0]: p for p in image_files}
+
+            all_points = []
+            all_colors = []
+
+            fx =  self.video_config['focal_length_x']
+            fy =  self.video_config['focal_length_y']
+            cx =  self.video_config['c_x']
+            cy =  self.video_config['c_y']
+
+            for idx, npy_file in enumerate(depth_npy_files):
+                base = os.path.splitext(os.path.basename(npy_file))[0]
+                img_path = base_to_img.get(base)
+                if img_path is None:
+                    # Skip if matching RGB is missing
+                    continue
+
+                depth_map = np.load(npy_file)
+                color_bgr = cv2.imread(img_path)
+                if color_bgr is None:
+                    continue
+
+                # Ensure color image matches depth resolution
+                h, w = depth_map.shape
+                color_bgr = cv2.resize(color_bgr, (w, h), interpolation=cv2.INTER_LINEAR)
+                rgb_frame = cv2.cvtColor(color_bgr, cv2.COLOR_BGR2RGB)
+
+                frame_points = []
+                frame_colors = []
+                for v in range(h):
+                    for u in range(w):
+                        depth = float(depth_map[v, u]) * self.pc_config['depth_scale']
+                        if depth > 0:
+                            x = (u - cx) * depth / fx
+                            y = (v - cy) * depth / fy
+                            z = depth
+                            frame_points.append([x, y, z])
+                            frame_colors.append(rgb_frame[v, u] / 255.0)
+
+                if frame_points:
+                    all_points.extend(frame_points)
+                    all_colors.extend(frame_colors)
+                    print(f"Depth {idx + 1}/{len(depth_npy_files)} - Points: {len(frame_points)}")
+
+            if all_points:
+                points_array = np.array(all_points)
+                colors_array = np.array(all_colors)
+
+                pcd = o3d.geometry.PointCloud()
+                pcd.points = o3d.utility.Vector3dVector(points_array)
+                pcd.colors = o3d.utility.Vector3dVector(colors_array)
+
+                pcd, _ = pcd.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.0)
+
+                print(f"\nSaving point cloud to {pointcloud_path}")
+                o3d.io.write_point_cloud(pointcloud_path, pcd)
+                print(f"Saved point cloud with {len(pcd.points)} points")
+
                 self._visualize_point_cloud(pcd)
 
     def _visualize_point_cloud(self, pcd):

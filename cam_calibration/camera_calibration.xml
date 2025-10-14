@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CameraCalibration>
+   <Metadata>
+      <CalibrationDate>2025-10-12 18:01:24</CalibrationDate>
+      <WorldUnits>millimeters</WorldUnits>
+      <NumPatterns>10</NumPatterns>
+      <ImageSize>3060 4080</ImageSize>
+   </Metadata>
+   <IntrinsicParameters>
+      <FocalLength>
+         <fx>3378.564745</fx>
+         <fy>3381.279446</fy>
+         <fx_error>9.392439</fx_error>
+         <fy_error>9.321437</fy_error>
+      </FocalLength>
+      <PrincipalPoint>
+         <cx>2027.426009</cx>
+         <cy>1537.537645</cy>
+         <cx_error>2.623570</cx_error>
+         <cy_error>2.958736</cy_error>
+      </PrincipalPoint>
+      <RadialDistortion>
+         <k1>0.160541</k1>
+         <k1_error>0.006718</k1_error>
+         <k2>-0.558629</k2>
+         <k2_error>0.028588</k2_error>
+      </RadialDistortion>
+      <TangentialDistortion>
+         <p1>0.000000</p1>
+         <p2>0.000000</p2>
+      </TangentialDistortion>
+      <IntrinsicMatrix>
+         <row1>3378.564745 0.000000 2027.426009</row1>
+         <row2>0.000000 3381.279446 1537.537645</row2>
+         <row3>0.000000 0.000000 1.000000</row3>
+      </IntrinsicMatrix>
+   </IntrinsicParameters>
+   <ExtrinsicParameters>
+      <Pattern id="1">
+         <RotationVector>
+            <rx>-0.007759</rx>
+            <ry>-0.003085</ry>
+            <rz>0.016649</rz>
+            <rx_error>0.001390</rx_error>
+            <ry_error>0.001084</ry_error>
+            <rz_error>0.000227</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-80.039846</tx>
+            <ty>-65.773604</ty>
+            <tz>248.883234</tz>
+            <tx_error>0.193041</tx_error>
+            <ty_error>0.217102</ty_error>
+            <tz_error>0.692158</tz_error>
+         </TranslationVector>
+      </Pattern>
+      <Pattern id="2">
+         <RotationVector>
+            <rx>-0.222830</rx>
+            <ry>0.010212</ry>
+            <rz>-0.017554</rz>
+            <rx_error>0.001128</rx_error>
+            <ry_error>0.000885</ry_error>
+            <rz_error>0.000234</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-85.845741</tx>
+            <ty>-74.329945</ty>
+            <tz>250.679581</tz>
+            <tx_error>0.185736</tx_error>
+            <ty_error>0.206745</ty_error>
+            <tz_error>0.664222</tz_error>
+         </TranslationVector>
+      </Pattern>
+      <Pattern id="3">
+         <RotationVector>
+            <rx>0.404330</rx>
+            <ry>0.000837</ry>
+            <rz>-0.003362</rz>
+            <rx_error>0.001282</rx_error>
+            <ry_error>0.000999</ry_error>
+            <rz_error>0.000271</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-90.982215</tx>
+            <ty>-62.454600</ty>
+            <tz>237.174848</tz>
+            <tx_error>0.187763</tx_error>
+            <ty_error>0.213539</ty_error>
+            <tz_error>0.682959</tz_error>
+         </TranslationVector>
+      </Pattern>
+      <Pattern id="4">
+         <RotationVector>
+            <rx>0.073551</rx>
+            <ry>0.267469</ry>
+            <rz>-0.003634</rz>
+            <rx_error>0.001316</rx_error>
+            <ry_error>0.001170</ry_error>
+            <rz_error>0.000282</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-80.823957</tx>
+            <ty>-58.938953</ty>
+            <tz>277.634523</tz>
+            <tx_error>0.202019</tx_error>
+            <ty_error>0.237528</ty_error>
+            <tz_error>0.720211</tz_error>
+         </TranslationVector>
+      </Pattern>
+      <Pattern id="5">
+         <RotationVector>
+            <rx>0.076526</rx>
+            <ry>-0.325328</ry>
+            <rz>-0.054472</rz>
+            <rx_error>0.001197</rx_error>
+            <ry_error>0.001115</ry_error>
+            <rz_error>0.000292</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-75.945224</tx>
+            <ty>-63.720627</ty>
+            <tz>225.934766</tz>
+            <tx_error>0.188207</tx_error>
+            <ty_error>0.201708</ty_error>
+            <tz_error>0.639743</tz_error>
+         </TranslationVector>
+      </Pattern>
+      <Pattern id="6">
+         <RotationVector>
+            <rx>0.226647</rx>
+            <ry>0.198852</ry>
+            <rz>0.313189</rz>
+            <rx_error>0.001553</rx_error>
+            <ry_error>0.001548</ry_error>
+            <rz_error>0.000330</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-49.788716</tx>
+            <ty>-75.105100</ty>
+            <tz>270.932531</tz>
+            <tx_error>0.207427</tx_error>
+            <ty_error>0.239278</ty_error>
+            <tz_error>0.739797</tz_error>
+         </TranslationVector>
+      </Pattern>
+      <Pattern id="7">
+         <RotationVector>
+            <rx>-0.200965</rx>
+            <ry>-0.305113</ry>
+            <rz>-0.023505</rz>
+            <rx_error>0.001116</rx_error>
+            <ry_error>0.001031</ry_error>
+            <rz_error>0.000314</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-67.467017</tx>
+            <ty>-82.316216</ty>
+            <tz>254.831207</tz>
+            <tx_error>0.201556</tx_error>
+            <ty_error>0.216865</ty_error>
+            <tz_error>0.693096</tz_error>
+         </TranslationVector>
+      </Pattern>
+      <Pattern id="8">
+         <RotationVector>
+            <rx>-0.166892</rx>
+            <ry>0.185596</ry>
+            <rz>0.028508</rz>
+            <rx_error>0.001611</rx_error>
+            <ry_error>0.001377</ry_error>
+            <rz_error>0.000321</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-87.390449</tx>
+            <ty>-80.812816</ty>
+            <tz>340.157416</tz>
+            <tx_error>0.248396</tx_error>
+            <ty_error>0.285524</ty_error>
+            <tz_error>0.882917</tz_error>
+         </TranslationVector>
+      </Pattern>
+      <Pattern id="9">
+         <RotationVector>
+            <rx>-0.007467</rx>
+            <ry>-0.011718</ry>
+            <rz>0.011396</rz>
+            <rx_error>0.001349</rx_error>
+            <ry_error>0.001046</ry_error>
+            <rz_error>0.000224</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-82.722265</tx>
+            <ty>-65.504717</ty>
+            <tz>244.245893</tz>
+            <tx_error>0.190016</tx_error>
+            <ty_error>0.213256</ty_error>
+            <tz_error>0.679241</tz_error>
+         </TranslationVector>
+      </Pattern>
+      <Pattern id="10">
+         <RotationVector>
+            <rx>0.040614</rx>
+            <ry>-0.032556</ry>
+            <rz>-0.010840</rz>
+            <rx_error>0.002977</rx_error>
+            <ry_error>0.002287</ry_error>
+            <rz_error>0.000339</rz_error>
+         </RotationVector>
+         <TranslationVector>
+            <tx>-88.676372</tx>
+            <ty>-78.115480</ty>
+            <tz>359.110431</tz>
+            <tx_error>0.284523</tx_error>
+            <ty_error>0.319676</ty_error>
+            <tz_error>1.026799</tz_error>
+         </TranslationVector>
+      </Pattern>
+   </ExtrinsicParameters>
+   <ReprojectionErrors>
+      <MeanError>1.684276</MeanError>
+      <MaxError>7.176415</MaxError>
+      <ImageError id="1">1.495943</ImageError>
+      <ImageError id="2">1.386465</ImageError>
+      <ImageError id="3">1.893331</ImageError>
+      <ImageError id="4">1.334945</ImageError>
+      <ImageError id="5">1.943764</ImageError>
+      <ImageError id="6">NaN</ImageError>
+      <ImageError id="7">3.511098</ImageError>
+      <ImageError id="8">1.237191</ImageError>
+      <ImageError id="9">1.486498</ImageError>
+      <ImageError id="10">1.202804</ImageError>
+   </ReprojectionErrors>
+</CameraCalibration>
