@@ -1,13 +1,13 @@
 {
   "video": {
-    "source": "WEB_CAM",
-    "width": 640,
-    "height": 480,
+    "source": "GAZEBO_CAMERA",
+    "width": 1920,
+    "height": 1080,
     "fps": 30,
-    "focal_length_x": 984.2439,
-    "focal_length_y": 980.8141,
-    "c_x": 690.0,
-    "c_y": 233.196
+    "focal_length_x": 1144.35,
+    "focal_length_y": 1142.5,
+    "c_x": 960.0,
+    "c_y": 540.0
   },
   "model": {
     "input_width": 640,
@@ -15,12 +15,12 @@
   },
   "point_cloud": {
     "enabled": true,
-    "window_width": 1024,
-    "window_height": 768,
+    "window_width": 1280,
+    "window_height": 720,
     "point_size": 1.0,
     "background_color": [0.1, 0.1, 0.1],
     "min_depth": 0.1,
-    "max_depth": 5.0,
+    "max_depth": 30.0,
     "subsample_factor": 4
   },
   "point_cloud_preprocessing": {
