@@ -105,6 +105,34 @@ def depth_to_points(
     return points, colors
 
 
+def colorize_disparity(disp_map):
+    """Convert a disparity map to a magma colormap following RT-MonoDepth scripts."""
+
+    disp = np.asarray(disp_map, dtype=np.float32)
+    if disp.ndim != 2:
+        raise ValueError("disp_map must have shape H x W")
+
+    valid_mask = np.isfinite(disp)
+    if not np.any(valid_mask):
+        return np.zeros((disp.shape[0], disp.shape[1], 3), dtype=np.uint8)
+
+    finite_values = disp[valid_mask]
+    vmin = float(finite_values.min())
+    vmax = float(np.percentile(finite_values, 95))
+    if not np.isfinite(vmax) or vmax <= vmin:
+        vmax = float(finite_values.max())
+    if vmax <= vmin:
+        vmax = vmin + 1e-6
+
+    normalized = np.zeros_like(disp, dtype=np.float32)
+    normalized[valid_mask] = (disp[valid_mask] - vmin) / (vmax - vmin)
+    normalized = np.clip(normalized, 0.0, 1.0)
+
+    disp_uint8 = (normalized * 255.0).astype(np.uint8)
+    colormap = cv2.applyColorMap(disp_uint8, cv2.COLORMAP_MAGMA)
+    return colormap
+
+
 class DepthProcessor:
     def __init__(
         self,
@@ -139,7 +167,7 @@ class DepthProcessor:
         self.depth_decoder.to(self.device).eval()
 
     def estimate_depth(self, frame):
-        """Run the network and return metric depth for a single frame."""
+        """Run the network and return metric depth and disparity for a single frame."""
 
         with torch.no_grad():
             input_image = cv2.resize(
@@ -158,8 +186,9 @@ class DepthProcessor:
 
             _, depth = disp_to_depth(disp, self.min_depth, self.max_depth)
             depth_map = depth.squeeze().cpu().numpy().astype(np.float32)
+            disp_map = disp.squeeze().cpu().numpy().astype(np.float32)
 
-            return depth_map, input_image
+            return depth_map, input_image, disp_map
 
 
 class PointCloudVisualizer:

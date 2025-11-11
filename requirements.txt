@@ -17,5 +17,8 @@ matplotlib>=3.7.2
 six>=1.16.0
 thop>=0.1.1.post220907003
 
+# Networking utilities
+requests>=2.31.0
+
 # Point Cloud Visualization
 open3d>=0.17.0
