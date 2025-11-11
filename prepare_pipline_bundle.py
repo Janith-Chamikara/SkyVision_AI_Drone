@@ -16,6 +16,7 @@ ITEMS_TO_COPY = [
     "networks",
     "weights/RTMonoDepth",
     "gazebo_simulation",
+    "ros_bridge",
 ]
 
 DEST_FOLDER = Path("pipline")
