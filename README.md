@@ -158,6 +158,17 @@ Press `q` to exit or `r` to reset the Open3D view. Add `--no_cuda` if you want t
 If OpenCV struggles to open your stream, try `--backend ffmpeg` and/or append additional variants with `--extra_url http://<ip>:<port>/video?x.mjpeg` so the script can test multiple endpoints.
 The capture helper automatically falls back to MJPEG (`?action=stream`, `/video.mjpg`) and snapshot endpoints (`/shot.jpg`, `/snapshot.jpg`) if the direct video feed isn't available.
 
+6. Subscribe to a ROS 2 camera topic (e.g., Gazebo bridge publishes `/camera_out`):
+
+```bash
+python ros_bridge/ros_camera_pointcloud.py \
+   --topic /camera_out \
+   --weight_path ./weights/RTMonoDepth/full/ms_640_192/ \
+   --config config_gazebo.json
+```
+
+This node requires a ROS 2 environment with `rclpy` and `cv_bridge` available (source your ROS setup first). Use `--min_interval` to throttle high-rate topics, `--frame_width/--frame_height` to resize frames before inference, and press `q`/`r` in the preview window to quit or reset the Open3D view.
+
 ### Metric Point Cloud Upgrade
 
 - For a line-by-line explanation of the metric depth and point-cloud changes, read `docs/metric_point_cloud_readme.md`.
