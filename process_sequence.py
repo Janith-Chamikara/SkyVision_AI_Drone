@@ -7,7 +7,8 @@ from lib.depth_point_cloud_utils import (
     DepthProcessor,
     build_pixel_grid,
     compute_scaled_intrinsics,
-    depth_to_points
+    depth_to_points,
+    colorize_disparity,
 )
 from lib.point_cloud_preprocessing import PointCloudPreprocessor
 import argparse
@@ -150,15 +151,12 @@ class SequenceProcessor:
                     print(f"Failed to read image: {image_file}")
                     continue
 
-                depth_map, _ = self.depth_processor.estimate_depth(frame)
+                depth_map, _, disp_map = self.depth_processor.estimate_depth(
+                    frame)
 
                 self._ensure_geometry_cache(frame.shape[:2], depth_map.shape)
 
-                depth_colormap = cv2.applyColorMap(
-                    cv2.normalize(depth_map, None, 0, 255,
-                                  cv2.NORM_MINMAX, cv2.CV_8U),
-                    cv2.COLORMAP_MAGMA
-                )
+                depth_colormap = colorize_disparity(disp_map)
 
                 depth_display = cv2.resize(
                     depth_colormap, (frame.shape[1], frame.shape[0]))

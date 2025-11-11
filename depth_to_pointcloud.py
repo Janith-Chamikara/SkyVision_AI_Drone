@@ -3,7 +3,11 @@ import json
 import numpy as np
 import open3d as o3d
 
-from lib.depth_point_cloud_utils import DepthProcessor, PointCloudVisualizer
+from lib.depth_point_cloud_utils import (
+    DepthProcessor,
+    PointCloudVisualizer,
+    colorize_disparity,
+)
 from lib.point_cloud_preprocessing import PointCloudPreprocessor
 from lib.video_utils import VideoSource
 
@@ -32,8 +36,9 @@ class DepthToPointCloud:
 
     def process_frame(self, frame):
         """Process a single frame to generate depth map and point cloud."""
-        depth_map, resized_frame = self.depth_processor.estimate_depth(frame)
-        return depth_map, resized_frame
+        depth_map, resized_frame, disp_map = self.depth_processor.estimate_depth(
+            frame)
+        return depth_map, resized_frame, disp_map
 
     def run(self):
         """Main processing loop."""
@@ -47,13 +52,10 @@ class DepthToPointCloud:
                     if not ret:
                         break
 
-                    depth_map, resized_frame = self.process_frame(frame)
+                    depth_map, resized_frame, disp_map = self.process_frame(
+                        frame)
 
-                    depth_colormap = cv2.applyColorMap(
-                        cv2.normalize(depth_map, None, 0, 255,
-                                      cv2.NORM_MINMAX, cv2.CV_8U),
-                        cv2.COLORMAP_MAGMA
-                    )
+                    depth_colormap = colorize_disparity(disp_map)
 
                     if self.pc_config['enabled']:
                         points, colors = self.visualizer.create_point_cloud(

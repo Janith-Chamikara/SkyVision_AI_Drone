@@ -57,6 +57,8 @@ RT-MonoDepth/
 
 ## Main Scripts
 
+Looking for end-to-end instructions on streaming a drone camera into the depth + point cloud pipeline (covering network feeds, ROS 2 bridges, Gazebo, and Jetson tips)? See `docs/drone_camera_pipeline_guide.md`.
+
 ### 1. Process Image Sequence (Video + Point Cloud)
 
 Use `process_sequence.py` to process a sequence of images, generate depth maps, create a visualization video, and build a point cloud.
@@ -142,6 +144,20 @@ python gazebo_simulation/process_sim_camera.py \
 
 This subscriber records PNG frames under `simulation_frames/sim_YYYYMMDD_HHMMSS/` and automatically calls `process_sequence.py` once capture stops (Ctrl+C) or reaches `--frame_limit`. Use `--no_preview` to skip the OpenCV window or `--no_cuda` to force CPU inference. The script requires Gazebo Transport Python bindings (`gz-transport`), and you should launch `gazebo_simulation/testing_robot_with_cam.sdf` before starting it.
 
+5. Stream a mobile IP camera with live depth + point cloud visualization:
+
+```bash
+python mobile_camera_pointcloud.py \
+   --url http://192.168.8.146:4747/video \
+   --weight_path ./weights/RTMonoDepth/full/ms_640_192/ \
+   --config config.json
+```
+
+Press `q` to exit or `r` to reset the Open3D view. Add `--no_cuda` if you want to keep inference on the CPU, and `--frame_width/--frame_height` to override the captured resolution. The script will reconnect automatically if the stream drops.
+
+If OpenCV struggles to open your stream, try `--backend ffmpeg` and/or append additional variants with `--extra_url http://<ip>:<port>/video?x.mjpeg` so the script can test multiple endpoints.
+The capture helper automatically falls back to MJPEG (`?action=stream`, `/video.mjpg`) and snapshot endpoints (`/shot.jpg`, `/snapshot.jpg`) if the direct video feed isn't available.
+
 ### Metric Point Cloud Upgrade
 
 - For a line-by-line explanation of the metric depth and point-cloud changes, read `docs/metric_point_cloud_readme.md`.
@@ -173,3 +189,5 @@ Saved point cloud with 3309127 points
 - Point clouds are automatically cleaned using statistical outlier removal
 - Videos are saved at 30 FPS with side-by-side visualization
 - Uses RTMonoDepth model for accurate real-time depth estimation
+
+export PYTHONPATH=$PYTHONPATH:/usr/lib/python3/dist-packages
