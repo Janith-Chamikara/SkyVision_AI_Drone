@@ -194,11 +194,13 @@ Saving point cloud to point_clouds/kitti-frames_pointcloud.ply
 Saved point cloud with 3309127 points
 ```
 
+### GZ simulation + ROS_GZ Bridge
+
+Link - https://github.com/Janith-Chamikara/skyvision_ros_ws
+
 ## Notes
 
 - Required output directories (`depth_videos/`, `point_clouds/`) should be created before running the scripts (see Setup section)
 - Point clouds are automatically cleaned using statistical outlier removal
 - Videos are saved at 30 FPS with side-by-side visualization
 - Uses RTMonoDepth model for accurate real-time depth estimation
-
-export PYTHONPATH=$PYTHONPATH:/usr/lib/python3/dist-packages
